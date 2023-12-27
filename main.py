@@ -27,23 +27,26 @@ def process_data(data):
     # Obtiene la fecha/hora actual
     now = datetime.now()
 
-    # Calcula la fecha de corte (5 días atrás)
-    cutoff = now - timedelta(days=5)
+    # Calcula la fecha de inicio (10 días atrás)
+    start_date = now - timedelta(days=10)
 
-    # Filtra el dataframe
-    data = data[data['Hora de publicación'] < cutoff]
+    # Calcula la fecha de corte (5 días atrás)
+    cutoff_date = now - timedelta(days=5)
+
+    # Filtra el dataframe para incluir solo los datos dentro del rango de tiempo deseado
+    data_filtered = data[(data['Hora de publicación'] >= start_date) & (data['Hora de publicación'] < cutoff_date)]
 
     # Agrupa y suma los ingresos
-    data_grouped = data.groupby(['Nombre de la página', 'Identificador del activo de video', 'Hora de publicación'])['Ingresos estimados (USD)'].sum().reset_index()
+    data_grouped = data_filtered.groupby(['Nombre de la página', 'Identificador del activo de video', 'Hora de publicación'])['Ingresos estimados (USD)'].sum().reset_index()
 
-    # Convert the 'Identificador del activo de video' column to String
+    # Convierte la columna 'Identificador del activo de video' a String
     data_grouped['Identificador del activo de video'] = data_grouped['Identificador del activo de video'].astype(str)
 
     # Filtra registros con cero ingresos
-    data_grouped = data_grouped[data_grouped['Ingresos estimados (USD)'] == 0]
+    data_no_income = data_grouped[data_grouped['Ingresos estimados (USD)'] == 0]
 
     # Muestra los datos
-    st.dataframe(data_grouped)
+    st.dataframe(data_no_income)
 
 if __name__ == "__main__":
     main()
