@@ -11,8 +11,9 @@ def main():
 
     if data_upload is not None:
         data = load_data(data_upload)
-        process_data(data)
+        processed_data = process_data(data)
         st.success('Análisis completado!')
+        st.dataframe(processed_data)
 
 def load_data(file):
     # Carga el archivo CSV a un dataframe
@@ -33,17 +34,17 @@ def process_data(data):
     # Filtra el dataframe
     data = data[data['Hora de publicación'] < cutoff]
 
-    # Agrupa y suma los ingresos
-    data_grouped = data.groupby(['Nombre de la página', 'Identificador del activo de video', 'Hora de publicación'])['Ingresos estimados (USD)'].sum().reset_index()
+    # Agrupa y suma los valores de las tres columnas de interés
+    data_grouped = data.groupby(['Nombre de la página', 'Identificador del activo de video', 'Hora de publicación']).agg({
+        'Ingresos estimados (USD)': 'sum',
+        'Veces que se compartió': 'sum',
+        'Reproducciones de video de 3 segundos': 'sum'
+    }).reset_index()
 
     # Convert the 'Identificador del activo de video' column to String
     data_grouped['Identificador del activo de video'] = data_grouped['Identificador del activo de video'].astype(str)
 
-    # Filtra registros con cero ingresos
-    data_grouped = data_grouped[data_grouped['Ingresos estimados (USD)'] == 0]
-
-    # Muestra los datos
-    st.dataframe(data_grouped)
+    return data_grouped
 
 if __name__ == "__main__":
     main()
