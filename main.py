@@ -31,7 +31,7 @@ def process_data(data):
     # Calcula la fecha de corte (5 días atrás)
     cutoff = now - timedelta(days=5)
 
-    # Filtra el dataframe
+    # Filtra el dataframe para incluir solo registros antes de la fecha de corte
     data = data[data['Hora de publicación'] < cutoff]
 
     # Agrupa y suma los valores de las tres columnas de interés
@@ -40,6 +40,9 @@ def process_data(data):
         'Veces que se compartió': 'sum',
         'Reproducciones de video de 3 segundos': 'sum'
     }).reset_index()
+
+    # Filtra para mostrar solo registros donde los ingresos estimados son igual a cero
+    data_grouped = data_grouped[data_grouped['Ingresos estimados (USD)'] == 0]
 
     # Convert the 'Identificador del activo de video' column to String
     data_grouped['Identificador del activo de video'] = data_grouped['Identificador del activo de video'].astype(str)
