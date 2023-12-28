@@ -3,6 +3,9 @@ import pandas as pd
 from datetime import datetime, timedelta
 import streamlit as st
 
+# Establece la configuración de la página con un diseño más amplio
+st.set_page_config(layout="wide")
+
 def main():
     st.title('Análisis de Video')
     st.write('Por favor, sube un archivo CSV con información de video para la analítica')
@@ -13,7 +16,8 @@ def main():
         data = load_data(data_upload)
         processed_data = process_data(data)
         st.success('Análisis completado!')
-        st.dataframe(processed_data)
+        # Utiliza todo el ancho de la página para el DataFrame
+        st.dataframe(processed_data, width=1500)
 
 def load_data(file):
     # Carga el archivo CSV a un dataframe
