@@ -82,3 +82,4 @@ def process_data(data):
     return data_grouped
 
 if __name__ == "__main__":
+main()
