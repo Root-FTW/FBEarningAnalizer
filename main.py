@@ -14,6 +14,13 @@ def main():
 
     if data_upload is not None:
         data = load_data(data_upload)
+        # Agrega un filtro para seleccionar el nombre de la página
+        unique_pages = data['Nombre de la página'].unique()
+        selected_page = st.selectbox('Filtrar por nombre de la página:', ['Todos'] + list(unique_pages))
+        
+        if selected_page != 'Todos':
+            data = data[data['Nombre de la página'] == selected_page]
+        
         processed_data = process_data(data)
         st.success('Análisis completado!')
         # Utiliza todo el ancho de la página para el DataFrame
