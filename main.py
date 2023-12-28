@@ -14,16 +14,25 @@ def main():
 
     if data_upload is not None:
         data = load_data(data_upload)
-        # Agrega un filtro para seleccionar el nombre de la página
+        # Filtro para seleccionar el nombre de la página
         unique_pages = data['Nombre de la página'].unique()
         selected_page = st.selectbox('Filtrar por nombre de la página:', ['Todos'] + list(unique_pages))
         
+        # Filtros adicionales
+        min_shares = st.slider('Filtrar por el mínimo de veces que se compartió:', 0, int(data['Veces que se compartió'].max()), 0)
+        max_earnings = st.slider('Filtrar por el máximo de ingresos estimados (USD):', 0.0, float(data['Ingresos estimados (USD)'].max()), 0.0)
+        min_views = st.slider('Filtrar por el mínimo de reproducciones de video de 3 segundos:', 0, int(data['Reproducciones de video de 3 segundos'].max()), 0)
+
+        # Aplicar filtros
         if selected_page != 'Todos':
             data = data[data['Nombre de la página'] == selected_page]
         
+        data = data[data['Veces que se compartió'] >= min_shares]
+        data = data[data['Ingresos estimados (USD)'] <= max_earnings]
+        data = data[data['Reproducciones de video de 3 segundos'] >= min_views]
+
         processed_data = process_data(data)
         st.success('Análisis completado!')
-        # Utiliza todo el ancho de la página para el DataFrame
         st.dataframe(processed_data, width=1500)
 
 def load_data(file):
@@ -55,7 +64,7 @@ def process_data(data):
     # Filtra para mostrar solo registros donde los ingresos estimados son igual a cero
     data_grouped = data_grouped[data_grouped['Ingresos estimados (USD)'] == 0]
 
-    # Convert the 'Identificador del activo de video' column to String
+    # Convierte la columna 'Identificador del activo de video' a String
     data_grouped['Identificador del activo de video'] = data_grouped['Identificador del activo de video'].astype(str)
 
     return data_grouped
