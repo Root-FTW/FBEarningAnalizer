@@ -18,18 +18,18 @@ def main():
         unique_pages = data['Nombre de la página'].unique()
         selected_page = st.selectbox('Filtrar por nombre de la página:', ['Todos'] + list(unique_pages))
         
-        # Filtros adicionales
-        min_shares = st.slider('Filtrar por el mínimo de veces que se compartió:', 0, int(data['Veces que se compartió'].max()), 0)
-        max_earnings = st.slider('Filtrar por el máximo de ingresos estimados (USD):', 0.0, float(data['Ingresos estimados (USD)'].max()), 0.0)
-        min_views = st.slider('Filtrar por el mínimo de reproducciones de video de 3 segundos:', 0, int(data['Reproducciones de video de 3 segundos'].max()), 0)
+        # Filtros adicionales con valores mínimos y máximos
+        min_shares, max_shares = st.slider('Filtrar por el número de veces que se compartió:', 0, int(data['Veces que se compartió'].max()), (0, int(data['Veces que se compartió'].max())))
+        min_earnings, max_earnings = st.slider('Filtrar por el rango de ingresos estimados (USD):', 0.0, float(data['Ingresos estimados (USD)'].max()), (0.0, float(data['Ingresos estimados (USD)'].max())))
+        min_views, max_views = st.slider('Filtrar por el rango de reproducciones de video de 3 segundos:', 0, int(data['Reproducciones de video de 3 segundos'].max()), (0, int(data['Reproducciones de video de 3 segundos'].max())))
 
         # Aplicar filtros
         if selected_page != 'Todos':
             data = data[data['Nombre de la página'] == selected_page]
-        
-        data = data[data['Veces que se compartió'] >= min_shares]
-        data = data[data['Ingresos estimados (USD)'] <= max_earnings]
-        data = data[data['Reproducciones de video de 3 segundos'] >= min_views]
+
+        data = data[(data['Veces que se compartió'] >= min_shares) & (data['Veces que se compartió'] <= max_shares)]
+        data = data[(data['Ingresos estimados (USD)'] >= min_earnings) & (data['Ingresos estimados (USD)'] <= max_earnings)]
+        data = data[(data['Reproducciones de video de 3 segundos'] >= min_views) & (data['Reproducciones de video de 3 segundos'] <= max_views)]
 
         processed_data = process_data(data)
         st.success('Análisis completado!')
@@ -60,9 +60,6 @@ def process_data(data):
         'Veces que se compartió': 'sum',
         'Reproducciones de video de 3 segundos': 'sum'
     }).reset_index()
-
-    # Filtra para mostrar solo registros donde los ingresos estimados son igual a cero
-    data_grouped = data_grouped[data_grouped['Ingresos estimados (USD)'] == 0]
 
     # Convierte la columna 'Identificador del activo de video' a String
     data_grouped['Identificador del activo de video'] = data_grouped['Identificador del activo de video'].astype(str)
