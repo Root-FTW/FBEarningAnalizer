@@ -76,9 +76,9 @@ def process_data(data):
         'Reproducciones de video de 3 segundos': 'sum'
     }).reset_index()
 
-    # Filtra para mostrar solo registros donde los ingresos estimados son mayores a cero
-    data_grouped = data_grouped[data_grouped['Ingresos estimados (USD)'] > 0]
+    # Filtra para mostrar solo registros donde los ingresos estimados son iguales a cero
+    data_grouped = data_grouped[data_grouped['Ingresos estimados (USD)'] == 0]
 
     return data_grouped
 
-if __name__ ==
+if __name__ == "__main__":
