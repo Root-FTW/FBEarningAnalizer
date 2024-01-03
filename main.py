@@ -14,7 +14,7 @@ def main():
 
     if data_upload is not None:
         data = load_data(data_upload)
-        # Filtro para seleccionar el nombre de la página
+        # Filtro para seleccionar el nombre de la página (opcional, dependiendo de si aún quieres este filtro)
         unique_pages = data['Nombre de la página'].unique()
         selected_page = st.selectbox('Filtrar por nombre de la página:', ['Todos'] + list(unique_pages))
         
@@ -58,8 +58,8 @@ def process_data(data):
     # Filtra el dataframe para incluir solo registros antes de la fecha de corte
     data = data[data['Hora de publicación'] < cutoff]
 
-    # Agrupa y suma los valores de las tres columnas de interés
-    data_grouped = data.groupby(['Nombre de la página', 'Identificador del activo de video', 'Hora de publicación']).agg({
+    # Agrupa y suma los valores de las tres columnas de interés solo por 'Identificador del activo de video'
+    data_grouped = data.groupby('Identificador del activo de video').agg({
         'Ingresos estimados (USD)': 'sum',
         'Veces que se compartió': 'sum',
         'Reproducciones de video de 3 segundos': 'sum'
