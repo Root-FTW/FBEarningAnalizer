@@ -46,15 +46,6 @@ def load_data(file):
     return data
 
 def process_data(data):
-    # Obtiene la fecha/hora actual
-    now = datetime.now()
-
-    # Calcula la fecha de corte (5 días atrás)
-    cutoff = now - timedelta(days=5)
-
-    # Filtra el dataframe para incluir solo registros antes de la fecha de corte
-    data = data[data['Hora de publicación'] < cutoff]
-
     # Agrupa y suma los valores de las tres columnas de interés por 'Nombre de la página', 'Identificador del activo de video', y 'Hora de publicación'
     data_grouped = data.groupby(['Nombre de la página', 'Identificador del activo de video', 'Hora de publicación']).agg({
         'Ingresos estimados (USD)': 'sum',
@@ -66,6 +57,6 @@ def process_data(data):
     data_grouped['Identificador del activo de video'] = data_grouped['Identificador del activo de video'].astype(str)
 
     return data_grouped
-
+    
 if __name__ == "__main__":
     main()
