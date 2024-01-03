@@ -20,6 +20,8 @@ def main():
         
         # Filtros adicionales con valores mínimos y máximos
         min_shares, max_shares = st.slider('Filtrar por el número de veces que se compartió:', 0, int(data['Veces que se compartió'].max()), (0, int(data['Veces que se compartió'].max())))
+        # Establecemos un umbral para considerar ingresos como cero
+        ingresos_minimos_para_considerar = 0.0001
         min_earnings, max_earnings = st.slider('Filtrar por el rango de ingresos estimados (USD):', 0.0, float(data['Ingresos estimados (USD)'].max()), (0.0, float(data['Ingresos estimados (USD)'].max())))
         min_views, max_views = st.slider('Filtrar por el rango de reproducciones de video de 3 segundos:', 0, int(data['Reproducciones de video de 3 segundos'].max()), (0, int(data['Reproducciones de video de 3 segundos'].max())))
 
@@ -28,16 +30,18 @@ def main():
             data = data[data['Nombre de la página'] == selected_page]
 
         data = data[(data['Veces que se compartió'] >= min_shares) & (data['Veces que se compartió'] <= max_shares)]
-        data = data[(data['Ingresos estimados (USD)'] >= min_earnings) & (data['Ingresos estimados (USD)'] <= max_earnings)]
+        # Modificamos el filtro para considerar el umbral de ingresos
+        data = data[((data['Ingresos estimados (USD)'] >= min_earnings) & (data['Ingresos estimados (USD)'] <= max_earnings)) | (data['Ingresos estimados (USD)'] < ingresos_minimos_para_considerar)]
         data = data[(data['Reproducciones de video de 3 segundos'] >= min_views) & (data['Reproducciones de video de 3 segundos'] <= max_views)]
 
         processed_data = process_data(data)
         st.success('Análisis completado!')
-        st.dataframe(processed_data, width=1500)
+        # Aseguramos que la visualización muestre la precisión correcta
+        st.dataframe(processed_data.style.format({'Ingresos estimados (USD)': '{:.4f}'}))
 
 def load_data(file):
-    # Carga el archivo CSV a un dataframe
-    data = pd.read_csv(file)
+    # Carga el archivo CSV a un dataframe y especificamos los tipos de datos
+    data = pd.read_csv(file, dtype={'Ingresos estimados (USD)': 'float64'})
 
     # Formatea 'Hora de publicación' como valor datetime
     data['Hora de publicación'] = pd.to_datetime(data['Hora de publicación'], format='%m/%d/%Y %H:%M')
